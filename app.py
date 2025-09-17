@@ -7,17 +7,10 @@ import numpy as np
 with open("Student_Marks_Prediction.pkl", "rb") as file:
     model = pickle.load(file)
 
-# Try to get expected number of input features
-try:
-    n_features = model.n_features_in_
-except AttributeError:
-    st.error("❌ Model input feature count could not be detected.")
-    st.stop()
-
-# --- Page Configuration ---
+# Streamlit config
 st.set_page_config(page_title="Student Marks Predictor", layout="centered")
 
-# --- Custom Styling ---
+# Custom CSS for background and buttons
 st.markdown("""
     <style>
         body {
@@ -54,19 +47,18 @@ with st.sidebar:
         }
     )
 
-# --- Home Page (Main App) ---
+# --- Home Page ---
 if selected == "Home":
     st.title("🎯 Student Marks Predictor")
 
-    st.markdown("Enter the values for the features used to train the model:")
+    st.markdown("Enter student data to predict their expected marks:")
 
-    input_values = []
-    for i in range(n_features):
-        val = st.number_input(f"Feature {i+1}", step=1.0, format="%.2f")
-        input_values.append(val)
+    # Custom feature inputs based on your training
+    number_courses = st.number_input("📚 Number of Courses", min_value=1, step=1)
+    time_study = st.number_input("⏱️ Time Spent Studying (in hours)", min_value=0.0, step=0.5)
 
     if st.button("🎓 Predict Marks"):
-        input_array = np.array(input_values).reshape(1, -1)
+        input_array = np.array([[number_courses, time_study]])
         try:
             prediction = model.predict(input_array)[0]
             st.success(f"✅ Predicted Marks: **{prediction:.2f}** out of 100")
@@ -77,16 +69,16 @@ if selected == "Home":
 elif selected == "About":
     st.title("ℹ️ About This App")
     st.markdown("""
-        This web app predicts student marks based on input features provided by the user.
+        This app predicts student marks based on:
+        - 📚 Number of courses
+        - ⏱️ Time spent studying
         
-        - Built using **Streamlit**
-        - Uses a pre-trained machine learning model
-        - You can deploy this app using **Streamlit Cloud** or locally
+        It uses a machine learning model trained with **Random Forest**, **Gradient Boosting**, and **AdaBoost** regressors.
 
-        **Developer:** Maruti Margale
+        ✅ Built with: **Python, Scikit-learn, Streamlit**
     """)
     st.markdown("---")
-    st.info("You can customize this About section with more content.")
+    st.info("You can extend this app by adding charts, feature importance, or uploading CSVs.")
 
 # Footer
 st.markdown("---")
